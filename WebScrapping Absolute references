@@ -1,0 +1,50 @@
+import requests 
+import csv
+import urllib.request
+import urllib.parse
+from bs4 import BeautifulSoup
+
+#Website for parsing 
+
+url ="https://www.census.gov/programs-surveys/popest.html" #making the link its own variable.
+
+r =requests.get(url) #fetching the webpage
+
+soup = BeautifulSoup(r.content, "html.parser") #creating a BeatuifulSoup object to parse the html text.
+
+#Creating a variable that locates all html anchor tags.
+
+links = soup.find_all("a")
+
+#Creating a loop that finds and wrangles all the weblinks,that have and html anchor tag <a> and and 'href' attribute.
+
+for link in links:
+    link.get("href")
+
+#Saving relative links as absolute links by creating the following funtion.
+
+def unique_links(tags, url): #defining a function that takes two arguements, a tags and absolute url.
+    cleaned_links =set() #this set variable ensures no duplicates.
+    
+    for link in links:
+        link =link.get("href")
+        
+        if link is None:
+            continue
+        if link.endswith('/') or link.endswith('#'):
+            link =link[-1] #this takes the stray '/' and '#' off the ends of links.
+        
+        abs_url =urllib.parse.urljoin(url,link) #This variable concateinates the base url with the realative links,making them absolute.
+        cleaned_links.add(abs_url) #Adding the product, absolute url links to the set.
+    
+    return cleaned_links
+
+cleaned_links =unique_links(links,url) #calling the function and passing the two arguments links and base url.
+
+#Exporting the output as a csv file named Task_AAM1_C996.csv
+
+with open("Task_AAM1_C996.csv", "w") as csv_file:
+
+  writer = csv.writer(csv_file,delimiter="\n") #writing to the csv file indicating the html end line '\n' to seperate.
+
+  writer.writerow(cleaned_links) #writing to the links list.
