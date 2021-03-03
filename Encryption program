@@ -1,0 +1,160 @@
+#The following program that encrypts and decrypts Intelligence reports.
+#The program contains a dictonary of agents with access and verifies their access code.
+#The program useses two crypography applications. A cryptpgraphy application called "Fernet" is used to generate a key
+# for encytption and decription. Specifically, the Fernet crypto will not be used on TOP SECRET information
+#and will only be utilized on information classified as SECRET . 
+#The TOP SECRET information utilizes a different crypto Advance Encrytion Standards which add more complexity to the crypto.
+# Furthermore, a TOP SECRET intelligence report can be accessed via backdoor 'if' statment.
+
+from cryptography.fernet import Fernet 
+TS_agents = {"Sega0341/0282/0913": "Agent Mike", 
+             "AgentHarleySEGA_012": "Agent Harley", 
+             "AgentPrestonSEGA_014": "Agent Preston", 
+             "AgentDanielSEGA_010": "Agent Daniel"} 
+
+menu_prompt = ("1. Add a report to encrypt \n" 
+               "2. Decrypt a report\n" 
+               "3. Terminate\n")
+                # menu prompt that gives the hueristic that only 3 options are available.
+
+while True: # while loop to start the prompts and program 
+    agent_code = input('Enter your agent key code:\n') # agent input of code
+    if agent_code in TS_agents: #verifies agents are listed in the dictionary
+
+        agent_key = TS_agents[agent_code] # uses the agent code as a key to verify agent name
+        print("Welcome Special " +  agent_key + "\nYou have now accessed a classified program")
+        print("What would you like to do?") # print statement of access verification which intitates the nest while loop
+   
+        while True:  
+            command = input(menu_prompt).lower().strip() #hueristic menu_prompt is displayed to the user
+
+            if command == '1': # user enters command 1 to encrypt a message /report
+                from cryptography.fernet import Fernet # imports Fernet crypto application
+                #prompts agent for the report to encode. 
+                message = input("Enter message to encrypt and classify:").encode()
+                #the input is a string which is then converted to bytes and codeded in basic 'utf -8' coding. 
+                key = Fernet.generate_key() #calling a Fernet function to generate a crypto key.
+                f = Fernet(key) # code needed to create a variable which acts as an encryption key
+                encrypted = f.encrypt(message)# Takes the convereted string of bytes and encrypts them with Fernet encryption 
+                #then addes the encryption key 'f' as an information assurance measure.
+
+                print("Here is your encypted message\n",encrypted )
+                print("\nThe inputed information is Classified as Secret // NOFORN ")
+
+            elif command == '2': # user enters command 2 to decrypt a message /report
+                from cryptography.fernet import Fernet #imports Fernett crypto application 
+                encrypted = input("Enter encrypted message for decoding:\n")
+                 
+                #The same type of key needed to encrypt is the same needed to decrypt. 
+                b = bytes(encrypted, 'utf-8') #This was a pain to figure out, converting the input encrytped string into bytes
+                #then decrypting the string - converted to bytes via basic 'utf -8' base 64 coding.
+                #decrypting the bytes(of a string( converted to bytes (of a string ))) 
+                
+                #While using the 'f' or 'Fernet key' used for decryption.
+                decrypted = f.decrypt(b) #core accomplishment for me
+
+                print("Below is the decryted and Classified message:\n") # Reminder of Classified information
+                print(decrypted)# print decrytped information 
+                print("\nThe inputed information is Classified as Secret // NOFORN. ")# Reminder of Classified information
+
+            elif command == '3': # Exit the program
+                print()
+                print("Exiting (S // NF)")# Reminder of Classified information
+                break # terminates the program
+       
+    #However, if the agent enters the Secret numeric code in the menu_prompt '10178286'
+            elif command == '10178286': # Backdoor access to a TOP SECRET reader-board.
+                print("Welcome to a TOP SECRET message board.\n What you are about to view is Classified TOP SECRET //NOFORN" )
+                print("Below is an encrypted Intelligence Report coded in AES crypto.")# Reminder of Classified information
+                print()
+               
+                #A lower probabilty of craking is utilized on the TOP SECRET reader -board.
+                # A a higher level of crypto is used on this portion of the program. 
+                #So, I imported Advanced Encrytption Standards which requires two keys to access a class. 
+                #that utilizes a 64 bit encodeding as well. 
+                from Crypto.Cipher import AES
+                from base64 import b64encode, b64decode
+                #SlTKeYOpHygTYkP3
+
+                class TOP_SECRET: 
+                # creates a class that takes instances of TOP_SECRET and encrypts them with AES protocol.  
+                #The class is part of a two key system that. A unquie BLUF_key will be passed as an argument to activiate 
+                #the initializer of class objects. Any instances of the class must be passed with the stated key.
+                #TS is the argument which is also an AES specific key code; when combined with an initilizing key code
+                #will give access to that specific class. 
+                    
+                    def __init__(self, TS='SlTKeYOpHygTYkP3'): # takes one argument, a specific AES key number I had to research.
+                        self.TS = TS # TOP SECRET
+                        self.enc_dec_method = 'utf-8' # giving the attribute basic 64 bit UNICODE encode / decode standard.
+                        # ensures that any text passed through will be treated with the uft-8 protocol.
+                                   
+                            #     TS, BLUF_text , BLUF_key 
+                    def encrypt(self, str_to_enc, str_key): # encryption method that takes two arguments (BLUF_text , a key)
+                        
+                         #MoreSecureKey = AES_function(BLUF_key, AES_protocol, TS)
+                            aes_obj = AES.new(str_key, AES.MODE_CFB, self.TS) 
+                            
+                            #variable = MoreSecureKey_to_encrypt(BLUF_text)
+                            hx_enc = aes_obj.encrypt(str_to_enc) # encrypting the string to the 
+                            
+                            #The next variable will convert a string of bits to bytes
+                            
+                            mret = b64encode(hx_enc).decode(self.enc_dec_method) 
+                            #the final encrypted and encoded bytes 
+                            return mret
+
+                             #TS , BLUF_enc_etxt, BLUF_key
+                    def decrypt(self, enc_str, str_key):# Decrytption method that takes three arguments 
+                        #then the methods decrypts the string with AES coding
+                            #creating a variable that is part of AES function; which takes a crypto key, initates an AES.MODE_CFB protocol
+                           
+                           #Variable = AESfunction_of(BLUF_key, AES Block of encryption, BLUF_text)
+                            aes_obj = AES.new(str_key, AES.MODE_CFB, self.TS) 
+                           
+                            #The next variable will convert bytes to a string of bits. 
+                            #Variable= 64bit type (BLUF_text( utf -8 encoding) 
+                            str_tmp = b64decode(enc_str.encode(self.enc_dec_method)) 
+                           
+                            str_dec = aes_obj.decrypt(str_tmp) # decrypting the bytes with the AES Key 
+                            #and converting them to a string
+                            mret = str_dec.decode(self.enc_dec_method) # Final decoding string ready for human consumption.
+                            return mret
+
+                #BLUF = Bottom Line Up Front. This message is my 2 minute elevator pitch which will printed out to the user in both 
+                #encrypted code and decrypted code. I subtley display my knowledge of Intelligence report writting 
+                # and knowledge of Classification standards of Classified information.
+                BLUF = TOP_SECRET() #Calling an instance for Top Secret information with the text to be encrypted below.
+                #BLUF_text will be passed as the argument AS either str_to_enc,in the encrypt method
+                BLUF_text = """\n TOP SECRET//NOFORN  \n 
+                BLUF:\n
+                This is a HUMINT Report about ((  Michael Benjamin Segaline  ))\nI am an Adventure Diver; I Scuba dive Nuclear Missile Silos.
+                I run ultra-marathons, summit volcanos, and glacaide down them. I train Brazilian Jiu Jitsu three days a week.\nI hunt, fish, spearfish, snowboard, surf, free- dive for lobster. I am a woodworker and entrepreneur with an\n Associates degree.
+                I am also Marine Corps Infantry combat veteran of twelve years, seven months, and two wars. 
+                I am a certified Combat Marksmanship Trainer and Master Instructor for the Federal Government.
+
+                During my time I attended an intelligence school where I became an 0282, Tactical De-breifer and am highly skilled in the art of elicitation of information from witting or unwitting human beings. For my survivability, \nI became the magical man who could enchant the Taliban.
+
+                In Sangin, Afghanistan 2011, the human condition was improved from my personal leadership. Specifically, in only a five-mile area, I was instrumental in facilitating the communal acceptance of allowing little girls to become educated. 
+                For the first time in that area, little Afghan girls were allowed to attend school alongside there brothers and cousins. Enabled, through my sustained patrolling efforts, effective Information Campaign, and unprecedented\nemployment of Psychological Operations. 
+
+                The twilight of my Marine Corps Carrier I was as a world-famous Combat Instructor at the \n School of Infantry West.Where I had trained well over 15,000 Service members and civilians as a formal\n platform Instructor. 
+
+                I am command presence and a dealer in hope. I am the living embodiment of the best leadership the United States has to offer. I leave my comfort zone, blossom where I am planted, and thrive in uncertainty. I am willing to go to places others are not, to conduct business on your behalf. Lastly, I will not give up on your organization after it has \nalready given up on its self.
+
+                Like me or not, in the end, you meet a man who scuba dives nuclear missile silos\n (TS//NF)."""
+                
+                 
+                #MyKey4TestingYnP is a generic AES key used to decrypt the AES encrypt and decrypt methods
+                BLUF_key = 'MyKey4TestingYnP' 
+                #BLUF_key is needed to initate the methods in the TOP SECRET class.
+                
+                BLUF_enc_text = BLUF.encrypt(BLUF_text, BLUF_key) # calls encryption method in TOP_SECRET class
+                BLUF_dec_text = BLUF.decrypt(BLUF_enc_text, BLUF_key)# calls decryption method in TOP_SECRET class
+                print(f'Encrypted:{BLUF_enc_text}  Decrypted:{BLUF_dec_text}') #printing encrypted and decrypted 2 minute pitch.
+            else:
+                print('Unrecognized command. Enter 1 , 2, or 3 ') # part of the first nested loop. 
+                #adding to the heuristic the user is limited on options
+
+    else:
+        print("You have no access")#part of outerloop; if the agent code isnt verified in the dictonary of agents.
+    break; #stops the program.
