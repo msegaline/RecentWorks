@@ -1,0 +1,155 @@
+#Importing libraries
+import pandas as pd
+import numpy as np
+import pytz
+from scipy import stats
+import seaborn as sns
+
+#Importing Dataset.
+
+dataset ='/Users/lindasegalini/Desktop/Data Sets/Accidental_Drug_Related_Deaths_2012-2018 (1).csv'
+drug_deaths = pd.read_csv(dataset, parse_dates=['Date']) #converting date to datetime64 
+
+df=drug_deaths.copy()
+
+#Data Preperation
+df.head()
+df.dtypes
+#Dropping unessary columns.
+
+df.drop(['ID','DateType','InjuryCityGeo','DeathCityGeo','ResidenceCityGeo','MannerofDeath','LocationifOther','DescriptionofInjury','InjuryPlace','InjuryCity','InjuryCounty','InjuryState'],axis =1)
+#Checking for NULL values
+df.isna
+
+#Every row has Null Values
+#Idenitfy and remove duplicates 
+
+df.drop_duplicates(keep="first", inplace=True)
+
+#There where no duplicate values
+#Identifying which states are included in the dataset
+
+df.InjuryState.unique()
+pd.value_counts(df['InjuryState'])
+df.describe()
+
+#Men are the majority of deaths in the dataset
+df.Sex.value_counts().plot(kind ='pie')
+
+#Compairing Gender, female to male counts and age.
+
+pd.crosstab(df.Sex, df.Age, margins =True)
+
+#Females are less than 1/2 as likely to die of accidental drug use.
+
+#The odds of a male drug death is p / (1-p) = 3773 / 5099 = .74 / (1-.74) = 2.8 times
+
+#The odds of female drug death is p / (1-p) = 1325 / 5099 = .25 / (1-.25) = .33 times.
+
+#Now compairing unnormalized data, compairing Age and Sex with overdose death.
+
+crosstab_01 = pd.crosstab(df.Age, df.Sex)
+crosstab_01.plot(kind ='bar', stacked =True, width =2)
+
+#Wow! If you are a female above the age of 30, you are at a higher chance to overdose vise > 30 yrs old.
+
+#Clear trendlines contoring the two distinct modes of death ages.
+sns.distplot(df.Age)
+
+sns.barplot(x='Age', y='Sex', data =df)
+
+#Female drug death rate for older women is higher than the older males.
+sns.boxplot(x="Sex", y="Age", data =df)
+
+#Creating variables of some drugs counts  
+#Herioin is the common killer, then Fentenyl
+print("Herion Tally")
+HeroinTally = df.Heroin.count()
+
+print(HeroinTally)
+print()
+
+print("Fentanyl Tally") 
+FentnaylTally = df.Fentanyl.count()
+print(FentnaylTally)
+print()
+
+print("AnyOpioid Talley")
+AnyOpioidTalley = df.AnyOpioid.count()
+print(AnyOpioidTalley)
+print()
+
+CocTally = df.Cocaine.count()
+print("Cocaine Tally")
+print(CocTally)
+print()
+
+AmphetTally = df.Amphet.count()
+print("Meth talley")
+print(AmphetTally)
+print()
+
+#Break down of drugs by race.
+
+#Getting unique races from dataset.
+
+df.Race.unique()
+
+# (( Cocaine  )) 
+#Now compairing unnormalized data, compairing Race with overdose death as it relates to Cocaine in the system.
+
+crosstab_01 = pd.crosstab(df.Race, df.Cocaine)
+
+crosstab_01.plot(kind ='bar',stacked =True)
+
+# (( Herioin )) 
+#Now compairing unnormalized data, compairing Race with overdose death as it relates to Herioin in the system.
+
+crosstab_01 = pd.crosstab(df.Race, df.Heroin)
+
+crosstab_01.plot(kind ='bar',stacked =True)
+
+# ((  Any Opioid  ))
+
+#Now compairing unnormalized data, compairing Race with overdose death as it relates to AnyOpioid in the system.
+
+crosstab_01 = pd.crosstab(df.Race, df.AnyOpioid)
+
+crosstab_01.plot(kind ='bar',stacked =True)
+
+# ((  Black Americans  ))
+
+#Getting the count of all attributes associated with Black Americans.
+# 433 identified as Black, 
+#Cocaine use amounst the black population is 235 / 433 = 0.54 %
+# 192 for AnyOpiate = 44%
+#Benzodiazine =11%
+#Methadone = 05%
+#Fetnayl = 42%
+#Ethanol = 29%
+
+
+df[df['Race'] == 'Black'].count()
+
+# ((  White Americans  ))
+#4004 Identified as white 
+df[df["Race"] == 'White'].count()
+
+#Cocaine 26%
+#Benzodiazipine 29%
+#Methadone = 02%
+#AnyOpiate = 48%
+#Herione = 50%
+#Fetanyl = 43%
+# Ethanol = 24%
+
+# ((  Hispanic Americans  ))
+
+df[df.Race =="Hispanic, White"].count()
+
+#Fetnayl = 47%
+#Heroin = 54%
+#Cocaine = 36%
+
+
+
