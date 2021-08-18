@@ -1,0 +1,88 @@
+#-- Importing all possibly nessesary liberaries --#
+import scipy.stats as stats
+import statsmodels.api as sm
+import numpy as np
+import statistics
+from scipy.stats import f_oneway
+from bioinfokit.analys import stat
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+import pandas as pd
+from scipy.stats import chi2_contingency
+from scipy.stats import chi
+from scipy.stats import chi2
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
+
+#--reading data--#
+df =pd.read_csv('/Users/lindasegalini/Desktop/WGU/New Program/Data Exporation/medical_clean.csv')
+
+#--Conducting Chi Square hypothesis test--#
+
+#--Creating a new dataframe for chi-sqaure to analyis of readmission and overweight patients--#
+df_chi = pd.crosstab(index =df['ReAdmis'],
+                       columns = df['Overweight']) 
+
+df_chi.columns =['No','Yes',]
+df_chi.index = ['Overweight','ReAdmitted']
+#-- Calling chi-square function with the new dataframe--#
+#--Conducting chi-square test for independence--#
+stat, p, dof, expected = chi2_contingency(df_chi)
+#--Displaying the degrees of freedom--#
+print("degrees of freedom =", dof)
+print()
+print("Expected = ",expected)
+print()
+# --Displaying the pvalue --#
+print('P-value = ', p)
+#--interpreting the test-statistic--#
+prob =0.95
+critical = chi2.ppf(prob, dof)
+print( 'Alpha level =',prob ,'Critical Value =',critical, 'Test statistic =',stat)
+
+if abs(stat) >= critical:
+    print('Dependent(reject H0)')
+else:
+    print('Independent (fail to reject H0)')
+
+#-- Interperating the p-value --#
+
+alpha = 1.0 - prob
+print('significance = ', alpha, p)
+if p <= alpha:
+    print('Dependent (reject H0)')
+else:
+    print('Independent (fail to reject H0)')
+
+#--Conducting Univariate Analysis--#
+#-- creating a new dataframe for uni variate analysis between the number of children per patient and patient income--#
+unidf = pd.DataFrame(df[['Income', 'Children']])
+
+#-- writing code to display a histogram and revieling the distrobutions of the selected univariate variables
+unidf.hist()
+
+#--Displaying the univariate distrobution of Services
+ 
+df.groupby('Services').size().plot.bar(rot=0)
+plt.show()
+
+#-- Showing the univariate distrution of Overweight pateints--#
+df.groupby('Overweight').size().plot.bar(rot=0)
+plt.show()
+
+#--Bivarite analysis between Overwieght vs. readmission --#
+
+tbl = pd.pivot_table(df.groupby(['Overweight', 'ReAdmis']).size().reset_index(),
+                     values =0,
+                     index='Overweight',
+                     columns =['ReAdmis'],
+                     aggfunc =np.sum)
+                     
+tbl.plot(kind='bar', stacked =True)
+
+ #--Dislaying the bivartiate distrobution between children and income with kernal density estimation--#
+
+sns.kdeplot(df.Income, df.Children)   
+
+
