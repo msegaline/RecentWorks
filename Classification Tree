@@ -1,0 +1,86 @@
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier 
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+#Now splitting the data into two sets : input and output set
+df = pd.read_csv('/Users/lindasegalini/Desktop/Data Sets/music.csv')
+X = df.drop(columns =['genre']) #-- by convention, the input set is a capital X --#
+y = df['genre'] #-- Now create outpur set by convention using a lowercase y --#
+
+model = DecisionTreeClassifier() #-- building a model --#
+model.fit(X,y) # -- passing the input, output data  -- #
+predictions = model.predict([ [21,1],[22,0]]) #-- making a predictions for a 21yrold male and a 22 yearold female --#
+predictions
+
+#-- the model predicts that a 21 yrold male likes hiphop and a 22 yr old female likes dance music-_#
+
+#-- Testing the accuracy of the model --#
+
+df = pd.read_csv('/Users/lindasegalini/Desktop/Data Sets/music.csv')
+X = df.drop(columns =['genre']) #-- by convention, the input set is a capital X --#
+y = df['genre'] #-- Now create outpur set by convention using a lowercase y --#
+#-- the below code will output a tuple which we will split into 4 variables. Also allocating 20% of data to testing--#
+#input sets------output sets---------#
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
+
+model = DecisionTreeClassifier() #-- building a model --#
+model.fit(X_train, y_train) # -- passing the training data  -- #
+predictions = model.predict(X_test) #-- passing the training data --#
+
+#-- Passing the testing data and predictions. This will return a score between 0 and 1 --#
+score = accuracy_score(y_test, predictions)
+score
+
+#-- The first time I ran the script the score was 100% then the second time it was 75% --#
+#-- therefore the accuracy is between 75 and 100% accurate. --Play around with the percent of testing data and see how bad teh accuracy becomes--#
+
+
+#--Model Persistance --# 
+
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+import joblib
+df = pd.read_csv('/Users/lindasegalini/Desktop/Data Sets/music.csv')
+X = df.drop(columns =['genre']) 
+y = df['genre'] 
+model = DecisionTreeClassifier()
+model.fit(X,y) 
+
+joblib.dump(model, 'Music_recommender.joblib')
+
+#-- Now calling to model to make predictions --#
+
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+import joblib
+# df = pd.read_csv('/Users/lindasegalini/Desktop/Data Sets/music.csv')
+# X = df.drop(columns =['genre']) 
+# y = df['genre'] 
+# model = DecisionTreeClassifier()
+# model.fit(X,y) 
+
+model = joblib.load('Music_recommender.joblib')
+predictions = model.predict([[21,1]]) 
+predictions
+
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn import tree
+
+df = pd.read_csv('/Users/lindasegalini/Desktop/Data Sets/music.csv')
+X = df.drop(columns =['genre']) 
+y = df['genre'] 
+
+model = DecisionTreeClassifier()
+model.fit(X,y) 
+
+tree.export_graphviz(model, out_file ='music_recomender.dot', 
+                     feature_names =['age','gender'],
+                     class_names = sorted(y.unique()),
+                     label ='all',
+                     rounded =True,
+                     filled =True )
+
+# open the saved file in vscode and check the three little dot icon on the top right of the vscode screen. Select
+# visualize to the side.
